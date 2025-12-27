@@ -9,12 +9,15 @@ public class PongCow {
 
     //The cow image rendered onscreen
     private ImageIcon cow = new ImageIcon(getClass().getResource("cow.jpg"));
+    private ImageIcon elliott = new ImageIcon(getClass().getResource("Elliott.png"));
 
     //The window panel
     private JPanel windowPanel;
 
     //Returns if the image is moving downwards/falling
     private boolean falling = true;
+
+    private boolean isElliott = true;
 
     //Returns the current background
     private int background = 0;
@@ -28,7 +31,10 @@ public class PongCow {
     //Returns the width and height of the window
     private int windowWidth, windowHeight;
 
-    private void startPongLoop(boolean running) {
+    //Declared as volatile to prevent thead from caching as false, which was a bug
+    private volatile boolean running = true;
+
+    private void startPongLoop() {
         int sleepTime = 10;
         while (running) {
             for (; cowX < windowWidth - cowBounds; cowX++) {
@@ -94,10 +100,11 @@ public class PongCow {
                 windowPanel.setBackground(Color.green);
                 background = 0;
         }
+        isElliott = !isElliott;
     }
 
     private void buildGui() {
-        JFrame window = new JFrame("Kossan göran spelar pong!");
+        JFrame window = new JFrame("Göran spelar pong!  (Elliott edition) ");
         window.setSize(600, 500);
         window.setLocationRelativeTo(null);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -106,7 +113,12 @@ public class PongCow {
             @Override
             public void paint(Graphics g) {
                 super.paint(g);
-                g.drawImage(cow.getImage(), cowX, cowY, cowBounds, cowBounds, null);
+                if(isElliott) {
+                    g.drawImage(elliott.getImage(), cowX, cowY, cowBounds, cowBounds, null);
+                }
+                else {
+                    g.drawImage(cow.getImage(), cowX, cowY, cowBounds, cowBounds, null);
+                }
             }
         };
 
@@ -125,7 +137,7 @@ public class PongCow {
 
     private void start() {
         buildGui();
-        startPongLoop(true);
+        startPongLoop();
     }
 
     //Main method
